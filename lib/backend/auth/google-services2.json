@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "453789512111",
+    "project_id": "project-home-5c1de",
+    "storage_bucket": "project-home-5c1de.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:453789512111:android:dcd660ee2583ac9c2e7f5a",
+        "android_client_info": {
+          "package_name": "com.example.orchid_furniture"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqo0OY5cxZJWBa6R9dJ_XQzkjWBrkoXAk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
