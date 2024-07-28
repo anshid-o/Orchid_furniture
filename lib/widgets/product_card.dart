@@ -1,5 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:orchid_furniture/constants.dart';
 import 'package:orchid_furniture/widgets/image_preview.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,6 +10,9 @@ import 'package:http/http.dart' as http;
 class ProductCard extends StatefulWidget {
   final String imageUrl;
   final String name;
+  final int len;
+  final int soldCount;
+  final int width;
   final String description;
   final double price;
   final String phone;
@@ -21,6 +24,9 @@ class ProductCard extends StatefulWidget {
 
   ProductCard({
     required this.imageUrl,
+    this.len = 0,
+    this.width = 0,
+    this.soldCount = 0,
     required this.name,
     required this.categ,
     required this.description,
@@ -74,6 +80,7 @@ class _ProductCardState extends State<ProductCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       elevation: 5,
       margin: EdgeInsets.all(10),
       shape: RoundedRectangleBorder(
@@ -127,6 +134,14 @@ class _ProductCardState extends State<ProductCard> {
                   ),
                 ),
                 SizedBox(height: 10),
+                widget.len != 0
+                    ? Text(
+                        'Size: ${widget.len} X ${widget.width} (cm)',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                        ),
+                      )
+                    : SizedBox(),
                 Text(
                   '\$${widget.price}',
                   style: TextStyle(
@@ -135,10 +150,19 @@ class _ProductCardState extends State<ProductCard> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                widget.soldCount != 0
+                    ? Text(
+                        'Sold Count: ${widget.soldCount}', // Display stock information
+                        style: TextStyle(
+                          color: Colors.green,
+                          fontSize: 14,
+                        ),
+                      )
+                    : SizedBox(),
                 Text(
                   'Available Stock: ${widget.stock}', // Display stock information
                   style: TextStyle(
-                    color: Colors.red,
+                    color: widget.stock > 5 ? col60 : Colors.red,
                     fontSize: 14,
                   ),
                 ),

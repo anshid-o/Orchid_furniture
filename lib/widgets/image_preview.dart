@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orchid_furniture/constants.dart';
 
 class ImageViewPage extends StatelessWidget {
   final String imageUrl;
@@ -9,7 +10,9 @@ class ImageViewPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: lightWoodcol,
       appBar: AppBar(
+        backgroundColor: lightWoodcol,
         title: Text('Product Image'),
       ),
       body: Center(

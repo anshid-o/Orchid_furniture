@@ -325,9 +325,16 @@ class _AddFurniturePageState extends State<AddFurniturePage> {
                         'width': _isSizeRequired ? int.parse(width) : 0,
                         'time': DateTime.now()
                       });
+                      setState(() {
+                        imageUrl0 = '';
+                        _nameController.text = '';
+                        _descriptionController.text = '';
+                        _priceController.text = '';
+                        _stock.text = '';
+                        _sellprice.text = '';
+                        _isSizeRequired = false;
+                      });
                       // Process data (e.g., send to server)
-                      print(
-                          'Furniture Added:$imageUrl0 $name, $description, $price, $_category, $_woodType, ${_isSizeRequired ? '$length x $width' : 'No custom size'}');
                       Fluttertoast.showToast(msg: 'Furniture Added');
                     }
                     if (imageUrl0 == '') {

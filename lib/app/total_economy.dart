@@ -32,8 +32,10 @@ class _EconomicDetailsPageState extends State<EconomicDetailsPage> {
 
       product['soldStock'] += saleData['itemCount'];
       product['soldAmount'] += product['sellPrice'];
+      // print(
+      //     '${product['sellPrice']} - ${product['price']} * ${saleData['itemCount']}');
       product['totalProfit'] +=
-          (product['sellPrice'] - product['price'] * saleData['itemCount']);
+          ((product['sellPrice'] - product['price']) * saleData['itemCount']);
     }
 
     return productList;
@@ -55,6 +57,11 @@ class _EconomicDetailsPageState extends State<EconomicDetailsPage> {
           }
 
           var productList = snapshot.data!;
+          productList.forEach(
+            (element) {
+              print(element['totalProfit']);
+            },
+          );
           double companyTotalProfit = productList.fold(
               0.0, (sum, product) => sum + product['totalProfit']);
           double totalCostRemainingProducts = productList.fold(0.0,
@@ -200,7 +207,7 @@ class _EconomicDetailsPageState extends State<EconomicDetailsPage> {
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
-                                  'Total Profit: \$${(product['soldStock'] * product['soldAmount']).toStringAsFixed(2)}',
+                                  'Total Profit: \$${(product['soldStock'] * (product['soldAmount'] - product['price'])).toStringAsFixed(2)}',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     color: Colors.green,

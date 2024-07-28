@@ -20,6 +20,7 @@ class _ShiftPageState extends State<ShiftPage> {
   TextEditingController amountController = TextEditingController();
   TextEditingController itemCountController = TextEditingController();
   String? selectedProductId;
+  int remainingStock = 0;
 
   bool isFlexible = false;
   bool isProfileCreated = false;
@@ -100,8 +101,8 @@ class _ShiftPageState extends State<ShiftPage> {
         _buildTextField('Customer Phone', customerPhoneController,
             keyboardType: TextInputType.phone),
         _buildTextField('Customer Place', customerPlaceController),
-        _buildTextField('Item Count', itemCountController,
-            keyboardType: TextInputType.number),
+        _buildItemCountField(
+            'Item Count (Upto $remainingStock)', itemCountController),
         _buildDateField('Select shifting date', dateContrl),
         Padding(
           padding: EdgeInsets.symmetric(horizontal: size.width * .2),
@@ -208,12 +209,34 @@ class _ShiftPageState extends State<ShiftPage> {
     );
   }
 
+  Widget _buildItemCountField(String label, TextEditingController controller,
+      {TextInputType keyboardType = TextInputType.number}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: TextStyle(color: Colors.black38)),
+        Container(
+          height: 50,
+          margin: const EdgeInsets.symmetric(vertical: 8.0),
+          child: TextField(
+            controller: controller,
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                hintText: label,
+                hintStyle: const TextStyle(height: 0)),
+          ),
+        ),
+      ],
+    );
+  }
+
   void _sellProduct() async {
     if (dateContrl.text == '' ||
         customerNameController.text == '' ||
         customerPhoneController.text == '' ||
         customerPlaceController.text == '' ||
-        amountController.text == '' ||
         itemCountController.text == '') {
       QuickAlert.show(
         context: context,
@@ -234,16 +257,27 @@ class _ShiftPageState extends State<ShiftPage> {
       return;
     }
 
+    int itemCount = int.parse(itemCountController.text);
+    if (itemCount > remainingStock) {
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.error,
+        title: 'Oops...',
+        text: 'Item count exceeds remaining stock.',
+      );
+      return;
+    }
+
     FirebaseFirestore.instance.collection('sales').add({
       'category': dropValue,
       'date': dateContrl.text,
       'customerName': customerNameController.text,
       'customerPhone': customerPhoneController.text,
       'customerPlace': customerPlaceController.text,
-      'amount': double.parse(amountController.text),
-      'itemCount': int.parse(itemCountController.text),
+      'itemCount': itemCount,
       'productId': selectedProductId,
     });
+
     final productRef = FirebaseFirestore.instance
         .collection('products')
         .doc(selectedProductId);
@@ -253,7 +287,7 @@ class _ShiftPageState extends State<ShiftPage> {
 
     if (snapshot.exists) {
       int currentStock = snapshot['stock'];
-      int newStock = currentStock - int.parse(itemCountController.text);
+      int newStock = currentStock - itemCount;
 
       // Update the stock value
       await productRef.update({'stock': newStock});
@@ -283,7 +317,11 @@ class _ShiftPageState extends State<ShiftPage> {
         .collection('products')
         .where('category', isEqualTo: dropValue)
         .get();
-
+    if (products.docs.length == 0) {
+      setState(() {
+        remainingStock = 0;
+      });
+    }
     showDialog(
       context: context,
       builder: (context) {
@@ -291,23 +329,29 @@ class _ShiftPageState extends State<ShiftPage> {
           title: Text('Select Product'),
           content: Container(
             width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: products.docs.length,
-              itemBuilder: (context, index) {
-                var product = products.docs[index];
-                return ListTile(
-                  leading: Image.network(product['url'], width: 50, height: 50),
-                  title: Text(product['name']),
-                  onTap: () {
-                    setState(() {
-                      selectedProductId = product.id;
-                    });
-                    Navigator.pop(context);
-                  },
-                );
-              },
-            ),
+            child: products.docs.length == 0
+                ? const Text('There are no products')
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: products.docs.length,
+                    itemBuilder: (context, index) {
+                      var product = products.docs[index];
+                      return ListTile(
+                        leading: Image.network(product['url'],
+                            width: 50, height: 50),
+                        title: Text(product['name']),
+                        onTap: () async {
+                          selectedProductId = product.id;
+                          remainingStock = product['stock'];
+                          setState(() {
+                            // Update the item count field label
+                            itemCountController.text = '';
+                          });
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
           ),
         );
       },
@@ -326,10 +370,12 @@ class _ShiftPageState extends State<ShiftPage> {
           }),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('sales')
-                  .where('category', isEqualTo: dropValue)
-                  .snapshots(),
+              stream: dropValue == 'All'
+                  ? FirebaseFirestore.instance.collection('sales').snapshots()
+                  : FirebaseFirestore.instance
+                      .collection('sales')
+                      .where('category', isEqualTo: dropValue)
+                      .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator());
@@ -352,9 +398,10 @@ class _ShiftPageState extends State<ShiftPage> {
                         }
 
                         var product = productSnapshot.data!;
-                        double profit =
-                            (product['sellPrice'] - product['price']) *
-                                sale['itemCount'];
+                        double profit = double.parse(
+                            ((product['sellPrice'] - product['price']) *
+                                    sale['itemCount'])
+                                .toString());
 
                         return Card(
                           color: Colors.white,
@@ -365,7 +412,7 @@ class _ShiftPageState extends State<ShiftPage> {
                           elevation: 5,
                           child: ExpansionTile(
                             leading: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                               child: Image.network(
                                 product['url'],
                                 width: 80,
@@ -456,6 +503,16 @@ class _ShiftPageState extends State<ShiftPage> {
                                         color: Colors.grey[700],
                                       ),
                                     ),
+                                    const SizedBox(height: 5),
+                                    product['length'] != 0
+                                        ? Text(
+                                            'Size: ${product['length']} X ${product['width']} (cm)',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.grey[700],
+                                            ),
+                                          )
+                                        : SizedBox(),
                                   ],
                                 ),
                               ),

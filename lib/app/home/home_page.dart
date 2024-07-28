@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'package:orchid_furniture/constants.dart';
 import 'package:orchid_furniture/app/home/show_products.dart';
-import 'package:orchid_furniture/app/home/total_economy.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,7 +28,7 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         backgroundColor: lightWoodcol,
         title: Text(
-          'H o m e',
+          'O R C H I D',
           style: TextStyle(
             fontSize: isPhone ? 24 : 42,
             color: woodcol,
@@ -81,22 +80,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-
-// : Padding(
-            //     padding: const EdgeInsets.all(8.0),
-            //     child: SizedBox(
-            //       height: size.height * .7,
-            //       child: ListView.separated(
-            //           itemBuilder: (context, index) => HomeCard(
-            //                 size: size,
-            //                 pids: pids,
-            //                 index: index,
-            //                 postList: postList,
-            //               ),
-            //           separatorBuilder: (context, index) => const SizedBox(
-            //                 height: 5,
-            //               ),
-            //           itemCount: postList.length),
-            //     ),
-            //   )

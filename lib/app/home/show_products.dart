@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:quickalert/quickalert.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -17,43 +17,90 @@ class _ProductListPageState extends State<ProductListPage> {
   final List<Map<String, dynamic>> products = [];
   final List<String> pids = [];
   getProducts() async {
-    await FirebaseFirestore.instance
-        .collection('products')
-        .where('category', isEqualTo: widget.categ)
-        .orderBy('time')
-        .get()
-        .then(
-      (value) {
-        value.docs.forEach(
-          (element) {
-            setState(() {
-              products.add(element.data());
-              pids.add(element.id);
-            });
-          },
-        );
-      },
-    );
+    if (widget.categ == 'All') {
+      await FirebaseFirestore.instance
+          .collection('products')
+          .orderBy('time')
+          .get()
+          .then(
+        (value) {
+          value.docs.forEach(
+            (element) {
+              setState(() {
+                products.add(element.data());
+                pids.add(element.id);
+              });
+            },
+          );
+        },
+      );
+    } else {
+      await FirebaseFirestore.instance
+          .collection('products')
+          .where('category', isEqualTo: widget.categ)
+          .orderBy('time')
+          .get()
+          .then(
+        (value) {
+          value.docs.forEach(
+            (element) {
+              setState(() {
+                products.add(element.data());
+                pids.add(element.id);
+              });
+            },
+          );
+        },
+      );
+    }
+  }
+
+  Map<String, int> mysoldStockCounts = {};
+  Future<void> fetchSoldStockCounts() async {
+    QuerySnapshot salesSnapshot =
+        await FirebaseFirestore.instance.collection('sales').get();
+
+    Map<String, int> soldStockCounts = {};
+
+    for (var sale in salesSnapshot.docs) {
+      var saleData = sale.data() as Map<String, dynamic>;
+      var productId = saleData['productId'];
+      var itemCount =
+          saleData['itemCount'] as num; // Ensure itemCount is treated as num
+
+      if (soldStockCounts.containsKey(productId)) {
+        soldStockCounts[productId] =
+            soldStockCounts[productId]! + itemCount.toInt();
+      } else {
+        soldStockCounts[productId] = itemCount.toInt();
+      }
+    }
+    setState(() {
+      mysoldStockCounts = soldStockCounts;
+    });
   }
 
   @override
   void initState() {
     // TODO: implement initState
     getProducts();
+    fetchSoldStockCounts();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: lightWoodcol,
       appBar: AppBar(
         title: Text('${widget.categ} Products'),
         backgroundColor: lightWoodcol,
       ),
       body: products.length == 0
           ? Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                gap20,
                 Lottie.asset('assets/empty.json'),
                 Text(
                   'No ${widget.categ} added',
@@ -66,15 +113,31 @@ class _ProductListPageState extends State<ProductListPage> {
               itemBuilder: (context, index) {
                 final product = products[index];
                 return ProductCard(
+                  soldCount: mysoldStockCounts.containsKey(pids[index])
+                      ? mysoldStockCounts[pids[index]]!
+                      : 0,
                   onDelete: () async {
-                    await FirebaseFirestore.instance
-                        .collection('products')
-                        .doc(pids[index])
-                        .delete();
-                    setState(() {
-                      products.removeAt(index);
-                      pids.removeAt(index);
-                    });
+                    QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.confirm,
+                      title: 'Confirm',
+                      text: 'Are you sure you want to delete?',
+                      cancelBtnText: 'No',
+                      confirmBtnText: 'Yes',
+                      onConfirmBtnTap: () async {
+                        await FirebaseFirestore.instance
+                            .collection('products')
+                            .doc(pids[index])
+                            .delete();
+                        setState(() {
+                          products.removeAt(index);
+                          pids.removeAt(index);
+                        });
+                      },
+                      onCancelBtnTap: () {
+                        Navigator.pop(context);
+                      },
+                    );
                   },
                   onEdit: () => _editProduct(
                       context,
@@ -90,6 +153,8 @@ class _ProductListPageState extends State<ProductListPage> {
                   imageUrl: product['url'],
                   name: product['name'],
                   description: product['desc'],
+                  len: product['length'],
+                  width: product['width'],
                   price: double.parse(product['price'].toString()),
                 );
               },
