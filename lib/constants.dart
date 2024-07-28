@@ -17,6 +17,7 @@ const gap20 = SizedBox(
 const gap10 = SizedBox(
   height: 10,
 );
+bool isPhone = false;
 
 MyCustomlAertDialod(
         BuildContext ctx, String title, String content, Color col) =>

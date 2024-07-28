@@ -1,10 +1,9 @@
 import 'package:clay_containers/clay_containers.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
-import 'package:orchid_furniture/backend/auth/auth.dart';
+
 import 'package:orchid_furniture/constants.dart';
-import 'package:orchid_furniture/frontend/widgets/home_card.dart';
+import 'package:orchid_furniture/app/home/show_products.dart';
+import 'package:orchid_furniture/app/home/total_economy.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,27 +13,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // List<Map<String, dynamic>> postList = [];
-  // List<String> pids = [];
-  // getPosts() async {
-  //   await FirebaseFirestore.instance
-  //       .collection('Posts')
-  //       .orderBy('time')
-  //       .get()
-  //       .then(
-  //     (value) {
-  //       value.docs.forEach(
-  //         (element) {
-  //           setState(() {
-  //             postList.add(element.data());
-  //             pids.add(element.id);
-  //           });
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
-
   @override
   void initState() {
     // TODO: implement initState
@@ -53,7 +31,7 @@ class _HomePageState extends State<HomePage> {
         title: Text(
           'H o m e',
           style: TextStyle(
-            fontSize: 42,
+            fontSize: isPhone ? 24 : 42,
             color: woodcol,
             fontWeight: FontWeight.bold,
           ),
@@ -64,24 +42,34 @@ class _HomePageState extends State<HomePage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
           child: GridView.count(
-              crossAxisCount: 3,
+              crossAxisCount: isPhone ? 2 : 3,
               children: List.generate(
                 categories.length,
                 (index) {
                   return Padding(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10, vertical: 10),
-                    child: ClayContainer(
-                      height: size.height * .2,
-                      width: size.width * .3,
-                      borderRadius: 30,
-                      color: lightWoodcol,
-                      child: Center(
-                        child: ClayText(
-                          categories[index],
-                          emboss: true,
-                          size: 40,
-                          textColor: Colors.black,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ProductListPage(
+                                      categ: categories[index],
+                                    )));
+                      },
+                      child: ClayContainer(
+                        height: size.height * .2,
+                        width: size.width * .3,
+                        borderRadius: 30,
+                        color: lightWoodcol,
+                        child: Center(
+                          child: ClayText(
+                            categories[index],
+                            emboss: true,
+                            size: isPhone ? 24 : 40,
+                            textColor: Colors.black,
+                          ),
                         ),
                       ),
                     ),

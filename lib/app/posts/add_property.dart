@@ -19,8 +19,10 @@ class _AddFurniturePageState extends State<AddFurniturePage> {
   TextEditingController _nameController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
   TextEditingController _priceController = TextEditingController();
+  TextEditingController _sellprice = TextEditingController();
   TextEditingController _lengthController = TextEditingController();
   TextEditingController _widthController = TextEditingController();
+  TextEditingController _stock = TextEditingController();
 
   String _category = 'Sofa';
   String _woodType = 'Oak';
@@ -165,7 +167,23 @@ class _AddFurniturePageState extends State<AddFurniturePage> {
               const SizedBox(height: 20),
               TextFormField(
                 controller: _priceController,
-                decoration: _inputDecoration('Price'),
+                decoration: _inputDecoration('Purchase Price'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter price';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _sellprice,
+                decoration: _inputDecoration('Selling Price'),
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 validator: (value) {
@@ -222,7 +240,23 @@ class _AddFurniturePageState extends State<AddFurniturePage> {
                   return null;
                 },
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _stock,
+                decoration: _inputDecoration('Count'),
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter count';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
               CheckboxListTile(
                 title: const Text('Add custom size?'),
                 value: _isSizeRequired,
@@ -282,11 +316,13 @@ class _AddFurniturePageState extends State<AddFurniturePage> {
                         'url': imageUrl0,
                         'name': _nameController.text,
                         'desc': _descriptionController.text,
-                        'price': _priceController.text,
+                        'price': int.parse(_priceController.text),
                         'category': _category,
+                        'stock': int.parse(_stock.text),
                         'wood': _woodType,
-                        'length': _isSizeRequired ? length : 0,
-                        'width': _isSizeRequired ? width : 0,
+                        'sellPrice': int.parse(_sellprice.text),
+                        'length': _isSizeRequired ? int.parse(length) : 0,
+                        'width': _isSizeRequired ? int.parse(width) : 0,
                         'time': DateTime.now()
                       });
                       // Process data (e.g., send to server)
@@ -331,8 +367,10 @@ class _AddFurniturePageState extends State<AddFurniturePage> {
       try {
         await referenceImageToUpload.putFile(f);
         String url = await referenceImageToUpload.getDownloadURL();
-        print(url);
-        setState(() {});
+
+        setState(() {
+          imageUrl0 = url;
+        });
         if (url == '') {
           ProgressIndicator;
         }
@@ -360,10 +398,10 @@ class _AddFurniturePageState extends State<AddFurniturePage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                const Center(
+                Center(
                   child: Text(
                     'Choose an option',
-                    style: TextStyle(fontSize: 40),
+                    style: TextStyle(fontSize: isPhone ? 26 : 40),
                   ),
                 ),
                 Row(
@@ -384,16 +422,16 @@ class _AddFurniturePageState extends State<AddFurniturePage> {
                               }
                               Navigator.pop(context);
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.camera_alt,
-                              size: 36,
+                              size: isPhone ? 26 : 36,
                             ),
                           ),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
+                        Text(
                           'Camera',
-                          style: TextStyle(fontSize: 26),
+                          style: TextStyle(fontSize: isPhone ? 20 : 26),
                         ),
                       ],
                     ),
@@ -412,16 +450,16 @@ class _AddFurniturePageState extends State<AddFurniturePage> {
                               }
                               Navigator.pop(context);
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.image,
-                              size: 36,
+                              size: isPhone ? 26 : 36,
                             ),
                           ),
                         ),
                         const SizedBox(height: 10),
-                        const Text(
+                        Text(
                           'Gallery',
-                          style: TextStyle(fontSize: 26),
+                          style: TextStyle(fontSize: isPhone ? 20 : 26),
                         ),
                       ],
                     ),

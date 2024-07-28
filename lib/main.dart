@@ -1,8 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:orchid_furniture/constants.dart';
-import 'package:orchid_furniture/frontend/app/main_page.dart';
-import 'package:orchid_furniture/frontend/entry/starter_page.dart';
+import 'package:orchid_furniture/app/main_page.dart';
+import 'package:orchid_furniture/entry/spalsh_screen.dart';
+import 'package:orchid_furniture/entry/starter_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => StarterPage(),
+        '/': (context) => SplashScreen(),
         '/main': (context) => const MainPage(),
       },
     );

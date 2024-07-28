@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:orchid_furniture/constants.dart';
+import 'package:orchid_furniture/app/Shift/shift_page.dart';
+import 'package:orchid_furniture/app/home/total_economy.dart';
 
-import 'package:orchid_furniture/frontend/app/posts/add_property.dart';
-import 'package:orchid_furniture/frontend/app/home/home_page.dart';
+import 'package:orchid_furniture/app/posts/add_property.dart';
+import 'package:orchid_furniture/app/home/home_page.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -19,12 +21,9 @@ class _MainPageState extends State<MainPage> {
   int selectedTab = 0;
   List<Widget> pages = [
     const HomePage(),
-    Text('data'),
-
-    // ShiftPage(),
     AddFurniturePage(),
-    // const ProfilePage()
-    Text('data'),
+    ShiftPage(),
+    EconomicDetailsPage()
   ];
 
   @override
@@ -49,21 +48,21 @@ class _MainPageState extends State<MainPage> {
             icon: Icon(
                 color: selectedTab == 1 ? woodcol : col60,
                 size: selectedTab == 1 ? 40 : 28,
-                Icons.bed_sharp),
+                Icons.add_outlined),
           ),
           BottomNavigationBarItem(
             label: '',
             icon: Icon(
                 color: selectedTab == 2 ? woodcol : col60,
                 size: selectedTab == 2 ? 40 : 28,
-                Icons.add_outlined),
+                Icons.bed_sharp),
           ),
           BottomNavigationBarItem(
             label: '',
             icon: Icon(
                 color: selectedTab == 3 ? woodcol : col60,
                 size: selectedTab == 3 ? 40 : 28,
-                Icons.person_outline),
+                Icons.monetization_on),
           ),
         ],
         currentIndex: selectedTab,
