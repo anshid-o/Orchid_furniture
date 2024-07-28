@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:orchid_furniture/constants.dart';
-import 'package:orchid_furniture/widgets/home_card.dart';
+import 'package:orchid_furniture/widgets/product_card.dart';
 
 class ProductListPage extends StatefulWidget {
   ProductListPage({super.key, required this.categ});

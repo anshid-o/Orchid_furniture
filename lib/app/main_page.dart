@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:orchid_furniture/constants.dart';
-import 'package:orchid_furniture/app/Shift/shift_page.dart';
+import 'package:orchid_furniture/app/sell_and_history.dart';
 import 'package:orchid_furniture/app/home/total_economy.dart';
 
-import 'package:orchid_furniture/app/posts/add_property.dart';
+import 'package:orchid_furniture/app/add_product.dart';
 import 'package:orchid_furniture/app/home/home_page.dart';
 
 class MainPage extends StatefulWidget {

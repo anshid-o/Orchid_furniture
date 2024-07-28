@@ -100,8 +100,6 @@ class _ShiftPageState extends State<ShiftPage> {
         _buildTextField('Customer Phone', customerPhoneController,
             keyboardType: TextInputType.phone),
         _buildTextField('Customer Place', customerPlaceController),
-        _buildTextField('Amount', amountController,
-            keyboardType: TextInputType.number),
         _buildTextField('Item Count', itemCountController,
             keyboardType: TextInputType.number),
         _buildDateField('Select shifting date', dateContrl),
